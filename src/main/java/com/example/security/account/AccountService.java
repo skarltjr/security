@@ -1,6 +1,8 @@
 package com.example.security.account;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,10 +31,12 @@ public class AccountService implements UserDetailsService {
                 .password(account.getPassword())
                 .roles(account.getRole())
                 .build();
+
     }
 
     public Account createNew(Account account) {
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         return accountRepository.save(account);
     }
+
 }
