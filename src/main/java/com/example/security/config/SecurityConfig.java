@@ -1,12 +1,14 @@
 package com.example.security.config;
 
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 
 @Configuration
@@ -42,5 +44,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin(); //로그아웃도 가능
         http
                 .httpBasic(); //httpBasic도 사용하겠다
+
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+        // 어디까지 자원을 공유할 것인가? -> 기본은 쓰레드로컬 하위 자식까지 가능하도록
+    }
+
+    /**  요청 - http filter 적용  / static resource - web */
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+       // web.ignoring().mvcMatchers("/favicon.ico"); // 파비콘 요청은 시큐리티 안걸리도록 그러나 다 설정하기 귀찮으니
+
+        web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        // 정적리소스 모두에 대해 ignore 적용
     }
 }
