@@ -46,8 +46,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .logout()
                 .logoutSuccessUrl("/");
-        http
-                .httpBasic(); //httpBasic도 사용하겠다
+       /* http
+                .httpBasic().disable(); //httpBasic도 사용하겠다 - 사용하지않겠다*/
 
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
         // 어디까지 자원을 공유할 것인가? -> 기본은 쓰레드로컬 하위 자식까지 가능하도록
