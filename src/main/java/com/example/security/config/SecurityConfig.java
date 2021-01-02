@@ -34,19 +34,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .mvcMatchers("/", "/info", "/account/**").permitAll()
+                .mvcMatchers("/", "/info", "/account/**","/signup").permitAll()
                 .mvcMatchers("/admin", "/dashBoard").hasRole("ADMIN")
                 .mvcMatchers("/User").hasRole("USER")
                 .anyRequest().authenticated() // 기타등등은 인증을 하면 접근할 수 있다
                 .expressionHandler(securityExpressionHandler());
                 //.and() //and로 이어가거나 아니면 Request내용 이후 다른 내용을 추가할 때 새로 http로 시작해주거나
         http
-                .formLogin(); //로그아웃도 가능
+                .formLogin() //로그아웃도 가능
+                .loginPage("/login").permitAll();
+        http
+                .logout()
+                .logoutSuccessUrl("/");
         http
                 .httpBasic(); //httpBasic도 사용하겠다
 
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
         // 어디까지 자원을 공유할 것인가? -> 기본은 쓰레드로컬 하위 자식까지 가능하도록
+        // @EanbleAync - @Async 어노테이션을 사용했을 때도 가능하도로고
     }
 
     /**  요청 - http filter 적용  / static resource - web */
