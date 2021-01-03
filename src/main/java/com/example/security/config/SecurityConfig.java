@@ -46,6 +46,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .logout()
                 .logoutSuccessUrl("/");
+        http
+                .sessionManagement()
+                .maximumSessions(1) // 한 곳에서만 로그인가능 - 아이디 돌려쓰거나 못하도록
+                .maxSessionsPreventsLogin(true); // 기본값은 false인데 만약 한곳에서만 로그인이 가능한데
+                                                // 2곳에서  로그인을 한 경우 true면 나중에 로그인하려는곳에서 막힘 false는 먼저 로그인한 곳 만료됨
        /* http
                 .httpBasic().disable(); //httpBasic도 사용하겠다 - 사용하지않겠다*/
 
