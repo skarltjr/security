@@ -1,7 +1,9 @@
 package com.example.security.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,10 +11,18 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
@@ -53,6 +63,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                                 // 2곳에서  로그인을 한 경우 true면 나중에 로그인하려는곳에서 막힘 false는 먼저 로그인한 곳 만료됨
        /* http
                 .httpBasic().disable(); //httpBasic도 사용하겠다 - 사용하지않겠다*/
+        http
+                .exceptionHandling()
+                .accessDeniedHandler(new AccessDeniedHandler() {
+                    @Override
+                    public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
+                        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                        String username = principal.getUsername();
+                        log.info(username + " is denied to access " + httpServletRequest.getRequestURI()); //서버단에 로그도 남겨주고
+                        httpServletResponse.sendRedirect("/access-denied");
+                    }
+                });
 
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
         // 어디까지 자원을 공유할 것인가? -> 기본은 쓰레드로컬 하위 자식까지 가능하도록
